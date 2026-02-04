@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
   }
 
   try {
-    const { id } = params;
+    const { id } = await params;
     const post = await db.getPostById(id);
 
     if (!post) {
@@ -31,7 +31,7 @@ export async function PUT(request, { params }) {
   }
 
   try {
-    const { id } = params;
+    const { id } = await params;
     const { title, category, content, image_url } = await request.json();
 
     if (!title || !category || !content) {
@@ -63,7 +63,7 @@ export async function DELETE(request, { params }) {
   }
 
   try {
-    const { id } = params;
+    const { id } = await params;
     await db.deletePost(id);
 
     return NextResponse.json(

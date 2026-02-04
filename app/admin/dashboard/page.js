@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [username] = useState('admin');
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -205,16 +206,16 @@ export default function AdminDashboard() {
                     </tr>
                   ) : (
                     contacts.map(contact => (
-                      <tr key={contact.id}>
-                        <td>{contact.name}</td>
-                        <td>{contact.email}</td>
-                        <td style={{ maxWidth: '300px' }}>
-                          {contact.message.substring(0, 100)}...
+                      <tr key={contact.id} style={{ cursor: 'pointer' }}>
+                        <td onClick={() => setSelectedMessage(contact)}>{contact.name}</td>
+                        <td onClick={() => setSelectedMessage(contact)}>{contact.email}</td>
+                        <td onClick={() => setSelectedMessage(contact)} style={{ maxWidth: '300px' }}>
+                          {contact.message.substring(0, 100)}{contact.message.length > 100 ? '...' : ''}
                         </td>
-                        <td>{new Date(contact.created_at).toLocaleDateString()}</td>
+                        <td onClick={() => setSelectedMessage(contact)}>{new Date(contact.created_at).toLocaleDateString()}</td>
                         <td className="actions">
                           <button 
-                            onClick={() => handleDeleteContact(contact.id)}
+                            onClick={(e) => { e.stopPropagation(); handleDeleteContact(contact.id); }}
                             className="btn btn-sm btn-danger"
                           >
                             Delete
@@ -228,6 +229,47 @@ export default function AdminDashboard() {
             </div>
           </section>
         </div>
+
+        {selectedMessage && (
+          <div className="modal-overlay" onClick={() => setSelectedMessage(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>📬 Message Details</h2>
+                <button className="modal-close" onClick={() => setSelectedMessage(null)}>✕</button>
+              </div>
+              <div className="modal-body">
+                <div className="message-detail">
+                  <strong>From:</strong> {selectedMessage.name}
+                </div>
+                <div className="message-detail">
+                  <strong>Email:</strong> {selectedMessage.email}
+                </div>
+                <div className="message-detail">
+                  <strong>Type:</strong> {selectedMessage.type}
+                </div>
+                <div className="message-detail">
+                  <strong>Date:</strong> {new Date(selectedMessage.created_at).toLocaleString()}
+                </div>
+                <div className="message-detail">
+                  <strong>Message:</strong>
+                  <p style={{ whiteSpace: 'pre-wrap', marginTop: '10px' }}>{selectedMessage.message}</p>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="btn btn-danger"
+                  onClick={() => {
+                    handleDeleteContact(selectedMessage.id);
+                    setSelectedMessage(null);
+                  }}
+                >
+                  Delete Message
+                </button>
+                <button className="btn btn-secondary" onClick={() => setSelectedMessage(null)}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
