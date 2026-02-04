@@ -4,6 +4,49 @@ import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const post = await db.getPostById(id);
+
+  if (!post) {
+    return {
+      title: 'Post Not Found'
+    };
+  }
+
+  // Get first 200 characters of content as description
+  const description = post.content
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .substring(0, 200)
+    .trim() + '...';
+
+  return {
+    title: `${post.title} - The Breadcrumb Gazette`,
+    description: description,
+    openGraph: {
+      title: post.title,
+      description: description,
+      type: 'article',
+      url: `https://windplex.vercel.app/post/${id}`,
+      images: post.image_url ? [
+        {
+          url: post.image_url,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        }
+      ] : [],
+      siteName: 'The Breadcrumb Gazette',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: description,
+      images: post.image_url ? [post.image_url] : [],
+    }
+  };
+}
+
 export default async function PostPage({ params }) {
   const { id } = (await params);
   const post = await db.getPostById(id);
