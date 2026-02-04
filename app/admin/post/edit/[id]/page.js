@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function EditPost({ params }) {
   const router = useRouter();
-  const { id } = params;
+  const resolvedParams = React.use(params);
+  const { id } = resolvedParams;
   const [formData, setFormData] = useState({
     title: '',
     category: 'lore',

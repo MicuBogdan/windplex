@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 export default async function PostPage({ params }) {
-  const { id } = params;
+  const { id } = (await params);
   const post = await db.getPostById(id);
 
   if (!post) {

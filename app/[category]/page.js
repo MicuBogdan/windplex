@@ -4,7 +4,7 @@ import { db } from '@/lib/database';
 export const dynamic = 'force-dynamic';
 
 export default async function CategoryPage({ params }) {
-  const { category } = params;
+  const { category } = (await params);
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
   const posts = await db.getPostsByCategory(category);
 
