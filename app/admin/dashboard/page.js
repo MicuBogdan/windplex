@@ -9,6 +9,7 @@ export default function AdminDashboard() {
   const [posts, setPosts] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [username] = useState('admin');
 
   useEffect(() => {
     loadData();
@@ -77,98 +78,157 @@ export default function AdminDashboard() {
   };
 
   if (loading) {
-    return <div className="admin-container">Loading...</div>;
+    return (
+      <div className="admin-layout">
+        <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="admin-container">
-      <div className="admin-header">
-        <h1>📰 Admin Dashboard</h1>
-        <div className="admin-actions">
-          <Link href="/" className="btn btn-secondary">View Site</Link>
-          <button onClick={handleLogout} className="btn btn-danger">Logout</button>
+    <div className="admin-layout">
+      <aside className="admin-sidebar">
+        <div className="admin-logo">
+          <h2>⚙️ Admin Panel</h2>
+          <p>Welcome, {username}</p>
         </div>
-      </div>
+        <nav className="admin-nav">
+          <Link href="/admin/dashboard" className="active">📊 Dashboard</Link>
+          <Link href="/admin/post/new">➕ New Post</Link>
+          <a href="/" target="_blank">🌐 View Site</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>🚪 Logout</a>
+        </nav>
+      </aside>
 
-      <div className="admin-section">
-        <div className="section-header">
-          <h2>Posts ({posts.length})</h2>
-          <Link href="/admin/post/new" className="btn btn-primary">+ New Post</Link>
+      <main className="admin-main">
+        <header className="admin-header">
+          <h1>Dashboard</h1>
+        </header>
+
+        <div className="admin-content">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">📝</div>
+              <div className="stat-info">
+                <h3>{posts.length}</h3>
+                <p>Total Posts</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">📬</div>
+              <div className="stat-info">
+                <h3>{contacts.filter(c => c.status === 'new').length}</h3>
+                <p>New Messages</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🔍</div>
+              <div className="stat-info">
+                <h3>{contacts.filter(c => c.type === 'helper').length}</h3>
+                <p>Helper Applications</p>
+              </div>
+            </div>
+          </div>
+
+          <section className="admin-section">
+            <div className="section-header">
+              <h2>Recent Posts</h2>
+              <Link href="/admin/post/new" className="btn btn-primary">➕ New Post</Link>
+            </div>
+            <div className="table-container">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {posts.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: 'center', padding: '40px' }}>
+                        No posts yet. Create your first post!
+                      </td>
+                    </tr>
+                  ) : (
+                    posts.map(post => (
+                      <tr key={post.id}>
+                        <td><strong>{post.title}</strong></td>
+                        <td>
+                          <span className={`badge badge-${post.category}`}>
+                            {post.category.toUpperCase()}
+                          </span>
+                        </td>
+                        <td>{new Date(post.created_at).toLocaleDateString()}</td>
+                        <td className="actions">
+                          <Link href={`/admin/post/edit/${post.id}`} className="btn btn-sm btn-secondary">
+                            Edit
+                          </Link>
+                          <button 
+                            onClick={() => handleDeletePost(post.id)}
+                            className="btn btn-sm btn-danger"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="admin-section">
+            <div className="section-header">
+              <h2>Contact Messages</h2>
+            </div>
+            <div className="table-container">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contacts.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
+                        No messages yet
+                      </td>
+                    </tr>
+                  ) : (
+                    contacts.map(contact => (
+                      <tr key={contact.id}>
+                        <td>{contact.name}</td>
+                        <td>{contact.email}</td>
+                        <td style={{ maxWidth: '300px' }}>
+                          {contact.message.substring(0, 100)}...
+                        </td>
+                        <td>{new Date(contact.created_at).toLocaleDateString()}</td>
+                        <td className="actions">
+                          <button 
+                            onClick={() => handleDeleteContact(contact.id)}
+                            className="btn btn-sm btn-danger"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
-
-        {posts.length > 0 ? (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map(post => (
-                <tr key={post.id}>
-                  <td>{post.title}</td>
-                  <td><span className="badge">{post.category}</span></td>
-                  <td>{new Date(post.created_at).toLocaleDateString()}</td>
-                  <td className="actions">
-                    <Link href={`/admin/post/edit/${post.id}`} className="btn btn-sm btn-secondary">
-                      Edit
-                    </Link>
-                    <button 
-                      onClick={() => handleDeletePost(post.id)}
-                      className="btn btn-sm btn-danger"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="empty-state">No posts yet</div>
-        )}
-      </div>
-
-      <div className="admin-section">
-        <h2>Contact Messages ({contacts.length})</h2>
-
-        {contacts.length > 0 ? (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Message</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contacts.map(contact => (
-                <tr key={contact.id}>
-                  <td>{contact.name}</td>
-                  <td>{contact.email}</td>
-                  <td style={{ maxWidth: '300px' }}>{contact.message.substring(0, 100)}...</td>
-                  <td>{new Date(contact.created_at).toLocaleDateString()}</td>
-                  <td className="actions">
-                    <button 
-                      onClick={() => handleDeleteContact(contact.id)}
-                      className="btn btn-sm btn-danger"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="empty-state">No messages yet</div>
-        )}
-      </div>
+      </main>
     </div>
   );
 }

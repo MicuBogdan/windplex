@@ -14,57 +14,52 @@ export default async function PostPage({ params }) {
 
   return (
     <>
+      <div className="minecraft-bg"></div>
+      
       <nav className="navbar">
-        <div className="container">
+        <div className="nav-container">
           <Link href="/" className="logo">📰 The Breadcrumb Gazette</Link>
-          <div className="nav-links">
-            <Link href="/lore">Lore</Link>
-            <Link href="/news">News</Link>
-            <Link href="/events">Events</Link>
-            <Link href="/contact">Contact</Link>
-          </div>
+          <ul className="nav-menu">
+            <li><Link href="/">Home</Link></li>
+            <li><Link href="/lore">Lore</Link></li>
+            <li><Link href="/news">News</Link></li>
+            <li><Link href="/events">Events</Link></li>
+            <li><Link href="/contact">Contact</Link></li>
+          </ul>
         </div>
       </nav>
 
-      <div className="container">
+      <main className="main-content">
         <article className="post-full">
           <div className="post-header">
-            <Link href={`/${post.category}`} className="post-category">
-              {post.category}
-            </Link>
+            <span className={`post-category ${post.category}`}>{post.category.toUpperCase()}</span>
             <h1 className="post-title">{post.title}</h1>
             <div className="post-meta">
-              Published on {new Date(post.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
+              <span className="post-date">📅 {new Date(post.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
             </div>
           </div>
 
           {post.image_url && (
-            <div className="post-image-full">
+            <div className="post-featured-image">
               <img src={post.image_url} alt={post.title} />
             </div>
           )}
 
-          <div 
-            className="post-body"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          <div className="post-body">
+            {post.content.split('\n').map((para, i) => para.trim() ? <p key={i}>{para}</p> : null)}
+          </div>
 
-          <div className="post-footer">
+          <div className="post-actions">
             <Link href={`/${post.category}`} className="btn btn-secondary">
-              ← Back to {post.category}
+              ← Back to {post.category.charAt(0).toUpperCase() + post.category.slice(1)}
             </Link>
+            <Link href="/" className="btn btn-primary">🏠 Home</Link>
           </div>
         </article>
-      </div>
+      </main>
 
       <footer className="footer">
-        <div className="container">
-          <p>📰 The Breadcrumb Gazette | Made by <a href="https://micubogdan.dev" target="_blank" style={{color: '#d4af8f', textDecoration: 'none', fontWeight: 'bold'}}>@micubogdan</a></p>
-        </div>
+        <p>📰 The Breadcrumb Gazette | Made by <a href="https://micubogdan.dev" target="_blank" style={{color: '#d4af8f', textDecoration: 'none', fontWeight: 'bold'}}>@micubogdan</a></p>
       </footer>
     </>
   );

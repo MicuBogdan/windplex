@@ -41,25 +41,26 @@ export default function AdminLogin() {
 
   return (
     <>
-      <style jsx global>{`
-        body {
-          background: var(--paper);
-        }
-      `}</style>
+      <div className="minecraft-bg"></div>
+      
+      <div className="login-container">
+        <div className="login-box">
+          <h1>🔐 Admin Login</h1>
+          <p className="subtitle">The Breadcrumb Gazette Admin Panel</p>
+          
+          {error && (
+            <div className="alert alert-error">
+              {error}
+            </div>
+          )}
 
-      <div className="admin-container">
-        <div className="admin-login">
-          <div className="admin-header">
-            <h1>📰 Admin Portal</h1>
-            <p>The Breadcrumb Gazette</p>
-          </div>
-
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
               <label htmlFor="username">Username</label>
               <input
                 type="text"
                 id="username"
+                name="username"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 required
@@ -72,28 +73,23 @@ export default function AdminLogin() {
               <input
                 type="password"
                 id="password"
+                name="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
               />
             </div>
 
-            {error && (
-              <div className="alert alert-error">
-                {error}
-              </div>
-            )}
-
-            <button type="submit" className="btn btn-primary" disabled={loading}>
+            <button type="submit" className="btn btn-primary btn-large" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </button>
-
-            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-              <Link href="/" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-                ← Back to website
-              </Link>
-            </div>
           </form>
+
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <Link href="/" style={{ color: '#888', textDecoration: 'none' }}>
+              ← Back to website
+            </Link>
+          </div>
         </div>
       </div>
     </>
