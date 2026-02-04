@@ -14,6 +14,7 @@ export default function NewPost() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [username] = useState('admin');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,69 +41,114 @@ export default function NewPost() {
     }
   };
 
+  const handleLogout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    router.push('/admin/login');
+  };
+
   return (
-    <div className="admin-container">
-      <div className="admin-header">
-        <h1>Create New Post</h1>
-        <Link href="/admin/dashboard" className="btn btn-secondary">← Back</Link>
-      </div>
-
-      <form onSubmit={handleSubmit} className="post-form">
-        <div className="form-group">
-          <label htmlFor="title">Title *</label>
-          <input
-            type="text"
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            required
-          />
+    <div className="admin-layout">
+      <aside className="admin-sidebar">
+        <div className="admin-logo">
+          <h2>⚙️ Admin Panel</h2>
+          <p>Welcome, {username}</p>
         </div>
+        <nav className="admin-nav">
+          <Link href="/admin/dashboard">📊 Dashboard</Link>
+          <Link href="/admin/post/new" className="active">➕ New Post</Link>
+          <a href="/" target="_blank">🌐 View Site</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>🚪 Logout</a>
+        </nav>
+      </aside>
 
-        <div className="form-group">
-          <label htmlFor="category">Category *</label>
-          <select
-            id="category"
-            value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            required
-          >
-            <option value="lore">Lore</option>
-            <option value="news">News</option>
-            <option value="events">Events</option>
-          </select>
+      <main className="admin-main">
+        <header className="admin-header">
+          <h1>Create New Post</h1>
+        </header>
+
+        <div className="admin-content">
+          <div className="form-container">
+            <form onSubmit={handleSubmit} className="post-form">
+              <div className="form-group">
+                <label htmlFor="title">Post Title *</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  required
+                  placeholder="Enter an epic title..."
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="category">Category *</label>
+                  <select
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    required
+                  >
+                    <option value="lore">📜 Lore</option>
+                    <option value="news">📰 News</option>
+                    <option value="events">🎉 Events</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="image_url">Image URL (optional)</label>
+                  <input
+                    type="url"
+                    id="image_url"
+                    name="image_url"
+                    value={formData.image_url}
+                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="content">Content *</label>
+                <textarea
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  required
+                  rows="15"
+                  placeholder="Write your story here... Use line breaks for new paragraphs."
+                />
+                <small>💡 Tip: Press Enter twice to create a new paragraph</small>
+              </div>
+
+              {error && (
+                <div className="alert alert-error">{error}</div>
+              )}
+
+              <div className="form-actions">
+                <Link href="/admin/dashboard" className="btn btn-secondary">Cancel</Link>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                  {loading ? 'Publishing...' : '📤 Publish Post'}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="help-box">
+            <h3>📝 Writing Tips</h3>
+            <ul>
+              <li><strong>Title:</strong> Make it catchy and descriptive</li>
+              <li><strong>Category:</strong> Choose Lore for stories, News for announcements, Events for activities</li>
+              <li><strong>Image:</strong> Add a screenshot or artwork URL (optional but recommended)</li>
+              <li><strong>Content:</strong> Tell your story! Add coordinates, player names, and details</li>
+            </ul>
+          </div>
         </div>
-
-        <div className="form-group">
-          <label htmlFor="image_url">Image URL (optional)</label>
-          <input
-            type="url"
-            id="image_url"
-            value={formData.image_url}
-            onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-            placeholder="https://example.com/image.jpg"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="content">Content * (HTML supported)</label>
-          <textarea
-            id="content"
-            rows="15"
-            value={formData.content}
-            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-            required
-          />
-        </div>
-
-        {error && (
-          <div className="alert alert-error">{error}</div>
-        )}
-
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Post'}
-        </button>
-      </form>
+      </main>
     </div>
   );
 }
