@@ -12,6 +12,22 @@ export default async function PostPage({ params }) {
     notFound();
   }
 
+  // Convert plain text to HTML paragraphs
+  const formatContent = (text) => {
+    // If already contains HTML tags, use as is
+    if (/<[a-z][\s\S]*>/i.test(text)) {
+      return text;
+    }
+    // Otherwise, convert newlines to paragraphs
+    return text
+      .split('\n\n')
+      .filter(para => para.trim())
+      .map(para => `<p>${para.trim().replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  };
+
+  const formattedContent = formatContent(post.content);
+
   return (
     <>
       <div className="minecraft-bg"></div>
@@ -39,15 +55,31 @@ export default async function PostPage({ params }) {
             </div>
           </div>
 
-          {post.image_url && (
-            <div className="post-featured-image">
-              <img src={post.image_url} alt={post.title} />
-            </div>
+          {post.category === 'news' && (
+            <>
+              <div className="post-body">
+                <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
+              </div>
+              {post.image_url && (
+                <div className="post-featured-image">
+                  <img src={post.image_url} alt={post.title} />
+                </div>
+              )}
+            </>
           )}
 
-          <div className="post-body">
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
-          </div>
+          {post.category !== 'news' && (
+            <>
+              {post.image_url && (
+                <div className="post-featured-image">
+                  <img src={post.image_url} alt={post.title} />
+                </div>
+              )}
+              <div className="post-body">
+                <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
+              </div>
+            </>
+          )}
 
           <div className="post-actions">
             <Link href={`/${post.category}`} className="btn btn-secondary">
