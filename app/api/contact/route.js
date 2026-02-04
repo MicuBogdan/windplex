@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try {
-    const { name, email, message } = await request.json();
+    const { name, email, type, message } = await request.json();
 
     if (!name || !email || !message) {
       return NextResponse.json(
@@ -12,7 +12,7 @@ export async function POST(request) {
       );
     }
 
-    await db.createContact(name, email, message);
+    await db.createContact(name, email, type || 'feedback', message);
 
     return NextResponse.json(
       { message: 'Contact message sent successfully' },
