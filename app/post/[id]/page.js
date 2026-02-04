@@ -46,7 +46,7 @@ export default async function PostPage({ params }) {
           )}
 
           <div className="post-body">
-            {post.content.split('\n').map((para, i) => para.trim() ? <p key={i}>{para}</p> : null)}
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
           </div>
 
           <div className="post-actions">
