@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { db } from '@/lib/database';
+import { getWikiSessionUser } from '@/lib/wikiAuth';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -7,6 +8,7 @@ export const dynamic = 'force-dynamic';
 export default async function WikiPage({ params }) {
   const { slug } = await params;
   const page = await db.getWikiPageBySlug(slug);
+  const user = await getWikiSessionUser();
 
   if (!page) {
     notFound();
@@ -58,6 +60,9 @@ export default async function WikiPage({ params }) {
 
           <div className="post-actions">
             <Link href="/wiki" className="btn btn-secondary">← Back to Wiki</Link>
+            {user && (
+              <Link href={`/wiki/edit/${page.slug}`} className="btn btn-primary">Suggest Edit</Link>
+            )}
             <Link href="/" className="btn btn-primary">🏠 Home</Link>
           </div>
         </article>

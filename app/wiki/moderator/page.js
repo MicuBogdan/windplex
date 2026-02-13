@@ -86,6 +86,7 @@ export default function WikiModerator() {
               <thead>
                 <tr>
                   <th>Title</th>
+                  <th>Type</th>
                   <th>Author</th>
                   <th>Date</th>
                   <th>Actions</th>
@@ -94,7 +95,7 @@ export default function WikiModerator() {
               <tbody>
                 {submissions.length === 0 ? (
                   <tr>
-                    <td colSpan="4" style={{ textAlign: 'center', padding: '40px' }}>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
                       No pending submissions
                     </td>
                   </tr>
@@ -102,6 +103,7 @@ export default function WikiModerator() {
                   submissions.map(submission => (
                     <tr key={submission.id}>
                       <td>{submission.title}</td>
+                      <td>{submission.page_id ? 'Edit' : 'New'}</td>
                       <td>{submission.username || 'Unknown'}</td>
                       <td>{new Date(submission.created_at).toLocaleDateString()}</td>
                       <td className="actions">

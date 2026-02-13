@@ -17,6 +17,26 @@ function withRandomSuffix(base) {
   return `${base}-${suffix}`;
 }
 
+async function notifyDiscord({ title, slug, author, content }) {
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  try {
+    const message = `📝 New wiki submission: **${title}** by **${author}**\nReview: /wiki/moderator\nPage: /wiki/${slug}`;
+    const markdown = `# ${title}\n\nAuthor: ${author}\nSlug: ${slug}\n\n---\n\n${content}`;
+    const formData = new FormData();
+    formData.append('content', message);
+    formData.append('file', new Blob([markdown], { type: 'text/markdown' }), `${slug}.md`);
+
+    await fetch(webhookUrl, {
+      method: 'POST',
+      body: formData
+    });
+  } catch (error) {
+    console.error('Discord webhook failed:', error);
+  }
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q');
@@ -60,6 +80,8 @@ export async function POST(request) {
     }
 
     await db.createWikiSubmission(null, slug, title, content, user.id);
+
+    await notifyDiscord({ title, slug, author: user.username, content });
 
     return NextResponse.json({ message: 'Submission sent for review' }, { status: 201 });
   } catch (error) {
