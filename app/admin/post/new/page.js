@@ -56,6 +56,7 @@ export default function NewPost() {
         <nav className="admin-nav">
           <Link href="/admin/dashboard">📊 Dashboard</Link>
           <Link href="/admin/post/new" className="active">➕ New Post</Link>
+          <Link href="/wiki/moderator" target="_blank">🛡️ Wiki Moderation</Link>
           <a href="/" target="_blank">🌐 View Site</a>
           <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>🚪 Logout</a>
         </nav>

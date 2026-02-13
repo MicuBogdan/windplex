@@ -96,6 +96,7 @@ export default function AdminDashboard() {
         <nav className="admin-nav">
           <Link href="/admin/dashboard" className="active">📊 Dashboard</Link>
           <Link href="/admin/post/new">➕ New Post</Link>
+          <Link href="/wiki/moderator" target="_blank">🛡️ Wiki Moderation</Link>
           <a href="/" target="_blank">🌐 View Site</a>
           <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>🚪 Logout</a>
         </nav>

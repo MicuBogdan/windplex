@@ -21,13 +21,18 @@ export default async function CategoryPage({ params }) {
       <nav className="navbar">
         <div className="nav-container">
           <Link href="/" className="logo">📰 The Breadcrumb Gazette</Link>
-          <ul className="nav-menu">
-            <li><Link href="/">Home</Link></li>
-            <li><Link href="/lore" className={category === 'lore' ? 'active' : ''}>Lore</Link></li>
-            <li><Link href="/news" className={category === 'news' ? 'active' : ''}>News</Link></li>
-            <li><Link href="/events" className={category === 'events' ? 'active' : ''}>Events</Link></li>
-            <li><Link href="/contact">Contact</Link></li>
-          </ul>
+          <div className="nav-actions">
+            <input type="checkbox" id="nav-toggle" className="nav-toggle" />
+            <label htmlFor="nav-toggle" className="nav-toggle-label">☰ Menu</label>
+            <ul className="nav-menu">
+              <li><Link href="/">Home</Link></li>
+              <li><Link href="/lore" className={category === 'lore' ? 'active' : ''}>Lore</Link></li>
+              <li><Link href="/news" className={category === 'news' ? 'active' : ''}>News</Link></li>
+              <li><Link href="/events" className={category === 'events' ? 'active' : ''}>Events</Link></li>
+              <li><Link href="/wiki">Wiki</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
+            </ul>
+          </div>
         </div>
       </nav>
 
