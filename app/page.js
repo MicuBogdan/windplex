@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const posts = await db.getAllPosts();
+  const discordUrl = 'https://discord.gg/u5kqgb6JQd';
 
   return (
     <>
@@ -76,6 +77,16 @@ export default async function Home() {
             <h2>Want to Contribute?</h2>
             <p>Join our team of explorers and help document the server's adventures</p>
             <Link href="/contact" className="btn btn-primary">Become a Helper</Link>
+          </div>
+        </section>
+
+        <section className="discord-section">
+          <div className="discord-content">
+            <h2>Stay on Point with News & Wiki</h2>
+            <p>Join our News & Wiki Discord server to get instant updates and community discussions.</p>
+            <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+              💬 Join Discord
+            </a>
           </div>
         </section>
       </main>

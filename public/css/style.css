@@ -684,6 +684,24 @@ h1, h2, h3 {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
+.discord-section {
+  margin-top: 2.5rem;
+  background: linear-gradient(135deg, #e8dcc8 0%, #d9cdb8 100%);
+  padding: 2.5rem;
+  border-radius: 0;
+  border: 4px solid #3d2817;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.discord-content h2 {
+  font-size: 1.6rem;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+}
+
 .cta-content h2 {
   font-size: 2rem;
   color: var(--accent);

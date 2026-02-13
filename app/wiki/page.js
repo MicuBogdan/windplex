@@ -9,6 +9,7 @@ export default async function WikiHome({ searchParams }) {
   const params = await searchParams;
   const query = params?.q?.toString() || '';
   const pages = query ? await db.searchWikiPages(query) : await db.getApprovedWikiPages();
+  const discordUrl = 'https://discord.gg/u5kqgb6JQd';
 
   return (
     <>
@@ -66,6 +67,15 @@ export default async function WikiHome({ searchParams }) {
               </>
             )}
           </div>
+          <div className="discord-section">
+            <div className="discord-content">
+              <h2>Stay on Point with News & Wiki</h2>
+              <p>Join our News & Wiki Discord server to get instant updates and community discussions.</p>
+              <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                💬 Join Discord
+              </a>
+            </div>
+          </div>
         </section>
 
         <section className="posts-section">
@@ -92,6 +102,7 @@ export default async function WikiHome({ searchParams }) {
             )}
           </div>
         </section>
+
       </main>
 
       <footer className="footer">
