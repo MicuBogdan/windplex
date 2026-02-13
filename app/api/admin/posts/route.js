@@ -2,6 +2,25 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { db } from '@/lib/database';
 
+async function notifyDiscord({ title, postId }) {
+  const webhookUrl = process.env.DISCORD_POSTS_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  const payload = {
+    content: `📰 New newspaper post: **${title}**\nRead: https://windplex.vercel.app/post/${postId}`
+  };
+
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (error) {
+    console.error('Discord post webhook failed:', error);
+  }
+}
+
 export async function GET() {
   const session = await getSession();
   
@@ -35,6 +54,8 @@ export async function POST(request) {
     }
 
     const postId = await db.createPost(title, category, content, image_url || null);
+
+    await notifyDiscord({ title, postId });
 
     return NextResponse.json(
       { message: 'Post created', postId },

@@ -3,6 +3,25 @@ import { db } from '@/lib/database';
 import { getWikiSessionUser } from '@/lib/wikiAuth';
 import { getSession } from '@/lib/auth';
 
+async function notifyDiscord({ title, slug }) {
+  const webhookUrl = process.env.DISCORD_POSTS_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  const payload = {
+    content: `📚 New World Archives page: **${title}**\nRead: https://windplex.vercel.app/wiki/${slug}`
+  };
+
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (error) {
+    console.error('Discord wiki webhook failed:', error);
+  }
+}
+
 function isModerator(user) {
   return user && (user.role === 'moderator' || user.role === 'admin');
 }
@@ -22,9 +41,13 @@ export async function PUT(request, { params }) {
     const reviewerId = user?.id || null;
 
     if (action === 'approve') {
-      const success = await db.approveWikiSubmission(id, reviewerId, note || null);
-      if (!success) {
+      const submission = await db.approveWikiSubmission(id, reviewerId, note || null);
+      if (!submission) {
         return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
+      }
+
+      if (!submission.page_id) {
+        await notifyDiscord({ title: submission.title, slug: submission.slug });
       }
       return NextResponse.json({ message: 'Submission approved' }, { status: 200 });
     }
