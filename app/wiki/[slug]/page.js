@@ -5,6 +5,37 @@ import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const page = await db.getWikiPageBySlug(slug);
+
+  if (!page) {
+    return { title: 'Page Not Found' };
+  }
+
+  const description = page.content
+    .replace(/<[^>]*>/g, '')
+    .substring(0, 200)
+    .trim() + '...';
+
+  return {
+    title: `${page.title} - World Archives`,
+    description,
+    openGraph: {
+      title: page.title,
+      description,
+      type: 'article',
+      url: `https://windplex.vercel.app/wiki/${slug}`,
+      siteName: 'World Archives'
+    },
+    twitter: {
+      card: 'summary',
+      title: page.title,
+      description
+    }
+  };
+}
+
 export default async function WikiPage({ params }) {
   const { slug } = await params;
   const page = await db.getWikiPageBySlug(slug);
@@ -14,12 +45,15 @@ export default async function WikiPage({ params }) {
     notFound();
   }
 
+  const linkify = (text) =>
+    text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
   const formattedContent = /<[a-z][\s\S]*>/i.test(page.content)
     ? page.content
     : page.content
         .split('\n\n')
         .filter(para => para.trim())
-        .map(para => `<p>${para.trim().replace(/\n/g, '<br>')}</p>`)
+        .map(para => `<p>${linkify(para.trim().replace(/\n/g, '<br>'))}</p>`)
         .join('');
 
   return (
@@ -69,7 +103,7 @@ export default async function WikiPage({ params }) {
       </main>
 
       <footer className="footer">
-        <p>📚 The Breadcrumb Gazette Wiki</p>
+        <p>📚 World Archives</p>
       </footer>
     </>
   );

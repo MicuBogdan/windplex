@@ -62,10 +62,13 @@ export default async function PostPage({ params }) {
       return text;
     }
     // Otherwise, convert newlines to paragraphs
+    const linkify = (value) =>
+      value.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+
     return text
       .split('\n\n')
       .filter(para => para.trim())
-      .map(para => `<p>${para.trim().replace(/\n/g, '<br>')}</p>`)
+      .map(para => `<p>${linkify(para.trim().replace(/\n/g, '<br>'))}</p>`)
       .join('');
   };
 

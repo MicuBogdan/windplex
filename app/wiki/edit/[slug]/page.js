@@ -141,7 +141,7 @@ export default function WikiEdit({ params }) {
       </main>
 
       <footer className="footer">
-        <p>📚 The Breadcrumb Gazette Wiki</p>
+        <p>📚 World Archives</p>
       </footer>
     </>
   );

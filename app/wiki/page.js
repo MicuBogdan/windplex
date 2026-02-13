@@ -34,7 +34,7 @@ export default async function WikiHome({ searchParams }) {
 
       <main className="main-content">
         <div className="page-header">
-          <h1 className="page-title">📚 Server Wiki</h1>
+          <h1 className="page-title">📚 World Archives</h1>
           <p className="page-subtitle">Discover and document the world, one page at a time.</p>
         </div>
 
@@ -95,7 +95,7 @@ export default async function WikiHome({ searchParams }) {
       </main>
 
       <footer className="footer">
-        <p>📚 The Breadcrumb Gazette Wiki</p>
+        <p>📚 World Archives</p>
       </footer>
     </>
   );
