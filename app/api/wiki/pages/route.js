@@ -57,7 +57,7 @@ export async function POST(request) {
   }
 
   try {
-    const { title, content } = await request.json();
+    const { title, content, featuredImageUrl, galleryImages } = await request.json();
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
@@ -78,6 +78,17 @@ export async function POST(request) {
     if (existingSubmission) {
       return NextResponse.json({ error: 'A submission with this title is already pending' }, { status: 400 });
     }
+
+    // Store featured image URL in submission (it will be transferred to the page on approval)
+    const submissionData = {
+      pageId: null,
+      slug,
+      title,
+      content,
+      createdBy: user.id,
+      featuredImageUrl: featuredImageUrl || null,
+      galleryImages: galleryImages || []
+    };
 
     await db.createWikiSubmission(null, slug, title, content, user.id);
 

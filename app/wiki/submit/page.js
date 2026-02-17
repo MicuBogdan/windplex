@@ -7,7 +7,10 @@ import Link from 'next/link';
 export default function WikiSubmit() {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({ title: '', content: '' });
+  const [formData, setFormData] = useState({ title: '', content: '', featuredImageUrl: '' });
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [newImageUrl, setNewImageUrl] = useState('');
+  const [newImageCaption, setNewImageCaption] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -41,7 +44,8 @@ export default function WikiSubmit() {
       const data = await res.json();
       if (res.ok) {
         setSuccess('Submission sent for review!');
-        setFormData({ title: '', content: '' });
+        setFormData({ title: '', content: '', featuredImageUrl: '' });
+        setGalleryImages([]);
       } else {
         setError(data.detail ? `${data.error} (${data.detail})` : (data.error || 'Failed to submit'));
       }
@@ -50,6 +54,21 @@ export default function WikiSubmit() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddGalleryImage = () => {
+    if (!newImageUrl.trim()) {
+      setError('Please enter an image URL');
+      return;
+    }
+
+    setGalleryImages([...galleryImages, { url: newImageUrl, caption: newImageCaption }]);
+    setNewImageUrl('');
+    setNewImageCaption('');
+  };
+
+  const handleRemoveGalleryImage = (index) => {
+    setGalleryImages(galleryImages.filter((_, i) => i !== index));
   };
 
   return (
@@ -95,6 +114,7 @@ export default function WikiSubmit() {
                 required
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="content">Content</label>
               <textarea
@@ -106,6 +126,71 @@ export default function WikiSubmit() {
               ></textarea>
               <small>Use plain text. We auto-format paragraphs.</small>
             </div>
+
+            <div className="form-group">
+              <label htmlFor="featuredImageUrl">Featured Image URL (Optional)</label>
+              <input
+                type="url"
+                id="featuredImageUrl"
+                placeholder="https://imgur.com/example.jpg"
+                value={formData.featuredImageUrl}
+                onChange={(e) => setFormData({ ...formData, featuredImageUrl: e.target.value })}
+              />
+              <small>Featured image appears in embeds and at the top of the page. Use Imgur or direct image URLs only.</small>
+              {formData.featuredImageUrl && (
+                <img src={formData.featuredImageUrl} alt="Featured" style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '1rem' }} />
+              )}
+            </div>
+
+            <div className="form-section">
+              <h3>Gallery Images (Optional)</h3>
+              <p className="form-hint">Add related images to the gallery. Modifiers can manage gallery after submission.</p>
+
+              <div className="gallery-input-group">
+                <input
+                  type="url"
+                  placeholder="https://imgur.com/example.jpg"
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  className="gallery-url-input"
+                />
+                <input
+                  type="text"
+                  placeholder="Image caption (optional)"
+                  value={newImageCaption}
+                  onChange={(e) => setNewImageCaption(e.target.value)}
+                  className="gallery-caption-input"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddGalleryImage}
+                  className="btn btn-secondary"
+                >
+                  Add Image
+                </button>
+              </div>
+
+              {galleryImages.length > 0 && (
+                <div className="gallery-preview">
+                  {galleryImages.map((img, idx) => (
+                    <div key={idx} className="gallery-preview-item">
+                      <img src={img.url} alt={`Gallery ${idx}`} />
+                      <div className="gallery-info">
+                        {img.caption && <p>{img.caption}</p>}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveGalleryImage(idx)}
+                          className="btn btn-small btn-error"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <div className="form-actions">
               <Link href="/wiki" className="btn btn-secondary">Cancel</Link>
               <button className="btn btn-primary" type="submit" disabled={loading}>

@@ -26,12 +26,18 @@ export async function generateMetadata({ params }) {
       description,
       type: 'article',
       url: `https://windplex.vercel.app/wiki/${slug}`,
-      siteName: 'World Archives'
+      siteName: 'World Archives',
+      ...(page.featured_image_url && {
+        image: page.featured_image_url
+      })
     },
     twitter: {
       card: 'summary',
       title: page.title,
-      description
+      description,
+      ...(page.featured_image_url && {
+        image: page.featured_image_url
+      })
     }
   };
 }
@@ -44,6 +50,8 @@ export default async function WikiPage({ params }) {
   if (!page) {
     notFound();
   }
+
+  const gallery = await db.getWikiPageGallery(page.id);
 
   const linkify = (text) =>
     text.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
@@ -88,9 +96,29 @@ export default async function WikiPage({ params }) {
             </div>
           </div>
 
+          {page.featured_image_url && (
+            <div className="post-featured-image">
+              <img src={page.featured_image_url} alt={page.title} />
+            </div>
+          )}
+
           <div className="post-body">
             <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
           </div>
+
+          {gallery.length > 0 && (
+            <section className="wiki-gallery-section">
+              <h2>📷 Gallery</h2>
+              <div className="wiki-gallery-grid">
+                {gallery.map((image) => (
+                  <figure key={image.id} className="gallery-item">
+                    <img src={image.image_url} alt={image.caption || 'Gallery image'} />
+                    {image.caption && <figcaption>{image.caption}</figcaption>}
+                  </figure>
+                ))}
+              </div>
+            </section>
+          )}
 
           <div className="post-actions">
             <Link href="/wiki" className="btn btn-secondary">← Back to Wiki</Link>

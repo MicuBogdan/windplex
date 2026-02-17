@@ -77,6 +77,8 @@ h1, h2, h3 {
   z-index: 100;
   backdrop-filter: blur(10px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  /* Smooth transition for scroll hide/show on mobile */
+  transition: transform 0.3s ease-in-out;
 }
 
 .nav-container {
@@ -171,6 +173,12 @@ h1, h2, h3 {
   padding: 2rem;
   position: relative;
   z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 120px;
+  }
 }
 
 /* Hero Section */
@@ -949,9 +957,17 @@ h1, h2, h3 {
   .page-title {
     font-size: 2rem;
   }
-
   .error-code {
     font-size: 5rem;
+  }
+
+  /* Mobile navbar scroll behavior - only hide on mobile */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0;
   }
 }
 
@@ -1131,4 +1147,174 @@ h1, h2, h3 {
   display: flex;
   gap: 0.75rem;
   margin-top: 1rem;
+}
+
+/* Gallery Styles */
+.wiki-gallery-section {
+  margin: 3rem 0;
+  padding: 2rem 0;
+  border-top: 4px double var(--primary);
+  border-bottom: 4px double var(--primary);
+}
+
+.wiki-gallery-section h2 {
+  font-size: 1.6rem;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  font-weight: bold;
+  font-family: 'Georgia', serif;
+}
+
+.wiki-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.gallery-item {
+  background: linear-gradient(135deg, #e8dcc8 0%, #d9cdb8 100%);
+  border: 4px solid #3d2817;
+  overflow: hidden;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s;
+  margin: 0;
+}
+
+.gallery-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-item figcaption {
+  padding: 1rem;
+  background: var(--paper);
+  color: var(--accent);
+  font-size: 0.95rem;
+  font-style: italic;
+  border-top: 2px solid var(--primary);
+  line-height: 1.5;
+}
+
+.gallery-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(232, 220, 200, 0.3);
+  border: 2px solid var(--primary);
+}
+
+.gallery-preview-item {
+  background: white;
+  border: 2px solid var(--primary);
+  overflow: hidden;
+  position: relative;
+}
+
+.gallery-preview-item img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-info {
+  padding: 0.5rem;
+  background: var(--light);
+  border-top: 2px solid var(--primary);
+}
+
+.gallery-info p {
+  font-size: 0.8rem;
+  color: var(--dark);
+  margin: 0 0 0.5rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gallery-url-input,
+.gallery-caption-input {
+  padding: 0.8rem;
+  border: 2px solid var(--primary);
+  background: rgba(232, 220, 200, 0.7);
+  color: var(--dark);
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  flex: 1;
+  min-width: 150px;
+}
+
+.gallery-input-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.form-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(232, 220, 200, 0.2);
+  border: 3px solid var(--primary);
+  border-radius: 0;
+}
+
+.form-section h3 {
+  font-size: 1.2rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-family: 'Georgia', serif;
+}
+
+.form-hint {
+  color: var(--gray);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.btn-error {
+  background: #8b5a3c;
+  color: var(--light);
+  border: 2px solid #6b4423;
+}
+
+.btn-error:hover {
+  background: #6b4423;
+  border-color: #4a2c1a;
+}
+
+@media (max-width: 768px) {
+  .wiki-gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .gallery-preview {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .gallery-input-group {
+    flex-direction: column;
+  }
+
+  .gallery-url-input,
+  .gallery-caption-input {
+    width: 100%;
+  }
 }
