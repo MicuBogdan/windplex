@@ -36,12 +36,12 @@ function isValidImageUrl(url) {
 export async function PUT(request, { params }) {
   const user = await getWikiSessionUser();
 
-  if (!user || user.role !== 'moderator' && user.role !== 'admin') {
+  if (!user || (user.role !== 'moderator' && user.role !== 'admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const { id } = await params;
+    const { slug } = await params;
     const { imageUrl } = await request.json();
 
     if (!imageUrl) {
@@ -55,7 +55,7 @@ export async function PUT(request, { params }) {
     }
 
     // Verify page exists
-    const page = await db.getWikiPageBySlug(id);
+    const page = await db.getWikiPageBySlug(slug);
     if (!page) {
       return NextResponse.json({ error: 'Page not found' }, { status: 404 });
     }

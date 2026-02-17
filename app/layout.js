@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
       <body>
         {children}
         <ParticlesScript />
-        <script src="/js/mobile-navbar.js"></script>
+        <script src="/js/mobile-navbar.js" defer></script>
       </body>
     </html>
   );
