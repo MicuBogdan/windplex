@@ -957,8 +957,78 @@ h1, h2, h3 {
   .page-title {
     font-size: 2rem;
   }
+
   .error-code {
     font-size: 5rem;
+  }
+
+  /* Mobile button and actions responsive styles */
+  .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-large {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-small {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+  }
+
+  .post-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .post-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .wiki-actions {
+    gap: 0.75rem;
+  }
+
+  .wiki-actions .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .discord-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .discord-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .discord-content .btn {
+    width: 100%;
+    margin-top: 1rem;
   }
 
   /* Mobile navbar scroll behavior - only hide on mobile */
