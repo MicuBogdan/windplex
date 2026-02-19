@@ -22,34 +22,44 @@ async function notifyDiscord({ title, slug, author, content, featuredImageUrl, g
   if (!webhookUrl) return;
 
   try {
-    const message = `📝 New wiki submission: **${title}** by **${author}**\nReview: /wiki/moderator\nPage: /wiki/${slug}`;
-    
-    let markdown = `# ${title}\n\nAuthor: ${author}\nSlug: ${slug}\n\n---\n\n${content}`;
-    
-    // Add featured image if present
-    if (featuredImageUrl) {
-      markdown += `\n\n## Featured Image\n![Featured Image](${featuredImageUrl})`;
-    }
-    
-    // Add gallery images if present
-    if (galleryImages && galleryImages.length > 0) {
-      markdown += `\n\n## Gallery\n`;
-      galleryImages.forEach((image, index) => {
-        markdown += `![Gallery Image ${index + 1}](${image.url})`;
-        if (image.caption) {
-          markdown += ` - ${image.caption}`;
+    const payload = {
+      content: `📝 New wiki submission from **${author}**`,
+      embeds: [
+        {
+          title: title,
+          description: content.substring(0, 200) + (content.length > 200 ? '...' : ''),
+          color: 0x8b7355,
+          thumbnail: featuredImageUrl ? { url: featuredImageUrl } : undefined,
+          fields: [
+            {
+              name: 'Author',
+              value: author,
+              inline: true
+            },
+            {
+              name: 'Review',
+              value: '[Moderator Panel](/wiki/moderator)',
+              inline: true
+            },
+            {
+              name: 'Page',
+              value: `/wiki/${slug}`,
+              inline: false
+            }
+          ]
         }
-        markdown += `\n`;
-      });
+      ]
+    };
+
+    // Remove undefined fields
+    if (!payload.embeds[0].thumbnail) {
+      delete payload.embeds[0].thumbnail;
     }
-    
-    const formData = new FormData();
-    formData.append('content', message);
-    formData.append('file', new Blob([markdown], { type: 'text/markdown' }), `${slug}.md`);
 
     await fetch(webhookUrl, {
       method: 'POST',
-      body: formData
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
   } catch (error) {
     console.error('Discord webhook failed:', error);

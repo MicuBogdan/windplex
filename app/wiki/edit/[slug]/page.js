@@ -8,7 +8,10 @@ export default function WikiEdit({ params }) {
   const router = useRouter();
   const [page, setPage] = useState(null);
   const [gallery, setGallery] = useState([]);
-  const [formData, setFormData] = useState({ title: '', content: '' });
+  const [formData, setFormData] = useState({ title: '', content: '', featuredImageUrl: '' });
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [newImageUrl, setNewImageUrl] = useState('');
+  const [newImageCaption, setNewImageCaption] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +29,7 @@ export default function WikiEdit({ params }) {
           return;
         }
         setPage(data.page);
-        setFormData({ title: data.page.title, content: data.page.content });
+        setFormData({ title: data.page.title, content: data.page.content, featuredImageUrl: data.page.featured_image_url || '' });
         
         // Fetch gallery images
         try {
@@ -34,6 +37,7 @@ export default function WikiEdit({ params }) {
           const galleryData = await galleryRes.json();
           if (galleryRes.ok && galleryData.images) {
             setGallery(galleryData.images);
+            setGalleryImages(galleryData.images.map(img => ({ url: img.image_url, caption: img.caption })));
           }
         } catch (err) {
           console.error('Failed to load gallery:', err);
@@ -57,7 +61,12 @@ export default function WikiEdit({ params }) {
       const res = await fetch(`/api/wiki/pages/${page.slug}/suggest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          title: formData.title,
+          content: formData.content,
+          featuredImageUrl: formData.featuredImageUrl,
+          galleryImages: galleryImages
+        })
       });
       const data = await res.json();
       if (res.ok) {
@@ -70,6 +79,21 @@ export default function WikiEdit({ params }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleAddGalleryImage = () => {
+    if (!newImageUrl.trim()) {
+      setError('Please enter an image URL');
+      return;
+    }
+
+    setGalleryImages([...galleryImages, { url: newImageUrl, caption: newImageCaption }]);
+    setNewImageUrl('');
+    setNewImageCaption('');
+  };
+
+  const handleRemoveGalleryImage = (index) => {
+    setGalleryImages(galleryImages.filter((_, i) => i !== index));
   };
 
   if (loading) {
@@ -144,9 +168,73 @@ export default function WikiEdit({ params }) {
               <small>Use plain text. We auto-format paragraphs.</small>
             </div>
 
-            {page?.featured_image_url && (
+            <div className="form-group">
+              <label htmlFor="featuredImageUrl">Featured Image URL (Optional)</label>
+              <input
+                type="url"
+                id="featuredImageUrl"
+                placeholder="https://imgur.com/example.jpg"
+                value={formData.featuredImageUrl}
+                onChange={(e) => setFormData({ ...formData, featuredImageUrl: e.target.value })}
+              />
+              <small>Featured image appears in embeds and at the top of the page. Use Imgur or direct image URLs only.</small>
+              {formData.featuredImageUrl && (
+                <img src={formData.featuredImageUrl} alt="Featured" style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '1rem' }} />
+              )}
+            </div>
+
+            <div className="form-section">
+              <h3>Gallery Images (Optional)</h3>
+              <p className="form-hint">Add or modify related images in the gallery. Moderators can manage after review.</p>
+
+              <div className="gallery-input-group">
+                <input
+                  type="url"
+                  placeholder="https://imgur.com/example.jpg"
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  className="gallery-url-input"
+                />
+                <input
+                  type="text"
+                  placeholder="Image caption (optional)"
+                  value={newImageCaption}
+                  onChange={(e) => setNewImageCaption(e.target.value)}
+                  className="gallery-caption-input"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddGalleryImage}
+                  className="btn btn-secondary"
+                >
+                  Add Image
+                </button>
+              </div>
+
+              {galleryImages.length > 0 && (
+                <div className="gallery-preview">
+                  {galleryImages.map((img, idx) => (
+                    <div key={idx} className="gallery-preview-item">
+                      <img src={img.url} alt={`Gallery ${idx}`} />
+                      <div className="gallery-info">
+                        {img.caption && <p>{img.caption}</p>}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveGalleryImage(idx)}
+                          className="btn btn-small btn-error"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {page?.featured_image_url && !formData.featuredImageUrl && (
               <div className="form-section">
-                <h3>Featured Image</h3>
+                <h3>Current Featured Image</h3>
                 <div style={{ maxWidth: '300px', margin: '1rem 0' }}>
                   <img src={page.featured_image_url} alt="Featured" style={{ width: '100%', border: '2px solid #3d2817' }} />
                   <p style={{ marginTop: '0.5rem', color: '#6b4423', fontSize: '0.9rem' }}>
@@ -156,9 +244,9 @@ export default function WikiEdit({ params }) {
               </div>
             )}
 
-            {gallery.length > 0 && (
+            {gallery.length > 0 && galleryImages.length === 0 && (
               <div className="form-section">
-                <h3>Gallery Images</h3>
+                <h3>Current Gallery</h3>
                 <div className="gallery-preview">
                   {gallery.map((image) => (
                     <div key={image.id} className="gallery-preview-item">

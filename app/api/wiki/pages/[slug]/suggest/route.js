@@ -2,20 +2,49 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/database';
 import { getWikiSessionUser } from '@/lib/wikiAuth';
 
-async function notifyDiscord({ title, slug, author, content }) {
+async function notifyDiscord({ title, slug, author, content, featuredImageUrl }) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) return;
 
   try {
-    const message = `🛠️ Wiki edit suggestion: **${title}** by **${author}**\nReview: /wiki/moderator\nPage: /wiki/${slug}`;
-    const markdown = `# ${title}\n\nAuthor: ${author}\nSlug: ${slug}\n\n---\n\n${content}`;
-    const formData = new FormData();
-    formData.append('content', message);
-    formData.append('file', new Blob([markdown], { type: 'text/markdown' }), `${slug}-edit.md`);
+    const payload = {
+      content: `🛠️ Wiki edit suggestion from **${author}**`,
+      embeds: [
+        {
+          title: title,
+          description: content.substring(0, 200) + (content.length > 200 ? '...' : ''),
+          color: 0x8b7355,
+          thumbnail: featuredImageUrl ? { url: featuredImageUrl } : undefined,
+          fields: [
+            {
+              name: 'Author',
+              value: author,
+              inline: true
+            },
+            {
+              name: 'Review',
+              value: '[Moderator Panel](/wiki/moderator)',
+              inline: true
+            },
+            {
+              name: 'Page',
+              value: `/wiki/${slug}`,
+              inline: false
+            }
+          ]
+        }
+      ]
+    };
+
+    // Remove undefined fields
+    if (!payload.embeds[0].thumbnail) {
+      delete payload.embeds[0].thumbnail;
+    }
 
     await fetch(webhookUrl, {
       method: 'POST',
-      body: formData
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
   } catch (error) {
     console.error('Discord webhook failed:', error);
@@ -37,15 +66,15 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Page not found' }, { status: 404 });
     }
 
-    const { title, content } = await request.json();
+    const { title, content, featuredImageUrl, galleryImages } = await request.json();
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
     }
 
-    await db.createWikiSubmission(page.id, slug, title, content, user.id);
+    await db.createWikiSubmission(page.id, slug, title, content, user.id, featuredImageUrl || null, galleryImages || []);
 
-    await notifyDiscord({ title, slug, author: user.username, content });
+    await notifyDiscord({ title, slug, author: user.username, content, featuredImageUrl: featuredImageUrl || null });
 
     return NextResponse.json({ message: 'Edit suggestion sent for review' }, { status: 201 });
   } catch (error) {
