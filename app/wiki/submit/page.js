@@ -35,10 +35,15 @@ export default function WikiSubmit() {
     setSuccess('');
 
     try {
+      const submitData = {
+        ...formData,
+        galleryImages: galleryImages
+      };
+
       const res = await fetch('/api/wiki/pages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
 
       const data = await res.json();
