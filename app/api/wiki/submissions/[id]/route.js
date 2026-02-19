@@ -3,12 +3,33 @@ import { db } from '@/lib/database';
 import { getWikiSessionUser } from '@/lib/wikiAuth';
 import { getSession } from '@/lib/auth';
 
-async function notifyDiscord({ title, slug }) {
+async function notifyDiscord({ title, slug, submission }) {
   const webhookUrl = process.env.DISCORD_POSTS_WEBHOOK_URL;
   if (!webhookUrl) return;
 
+  let content = `📚 New World Archives page: **${title}**\nRead: https://windplex.vercel.app/wiki/${slug}`;
+  
+  // Add featured image if present
+  if (submission.featured_image_url) {
+    content += `\nFeatured: ${submission.featured_image_url}`;
+  }
+  
+  // Add gallery images if present
+  let galleryImages = [];
+  try {
+    if (submission.gallery_images) {
+      galleryImages = typeof submission.gallery_images === 'string' ? JSON.parse(submission.gallery_images) : submission.gallery_images;
+    }
+  } catch (e) {
+    console.error('Failed to parse gallery images:', e);
+  }
+  
+  if (galleryImages.length > 0) {
+    content += `\nGallery: ${galleryImages.map(img => img.url).join(' | ')}`;
+  }
+
   const payload = {
-    content: `📚 New World Archives page: **${title}**\nRead: https://windplex.vercel.app/wiki/${slug}`
+    content
   };
 
   try {
@@ -47,7 +68,7 @@ export async function PUT(request, { params }) {
       }
 
       if (!submission.page_id) {
-        await notifyDiscord({ title: submission.title, slug: submission.slug });
+        await notifyDiscord({ title: submission.title, slug: submission.slug, submission });
       }
       return NextResponse.json({ message: 'Submission approved' }, { status: 200 });
     }

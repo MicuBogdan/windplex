@@ -17,13 +17,32 @@ function withRandomSuffix(base) {
   return `${base}-${suffix}`;
 }
 
-async function notifyDiscord({ title, slug, author, content }) {
+async function notifyDiscord({ title, slug, author, content, featuredImageUrl, galleryImages }) {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) return;
 
   try {
     const message = `📝 New wiki submission: **${title}** by **${author}**\nReview: /wiki/moderator\nPage: /wiki/${slug}`;
-    const markdown = `# ${title}\n\nAuthor: ${author}\nSlug: ${slug}\n\n---\n\n${content}`;
+    
+    let markdown = `# ${title}\n\nAuthor: ${author}\nSlug: ${slug}\n\n---\n\n${content}`;
+    
+    // Add featured image if present
+    if (featuredImageUrl) {
+      markdown += `\n\n## Featured Image\n![Featured Image](${featuredImageUrl})`;
+    }
+    
+    // Add gallery images if present
+    if (galleryImages && galleryImages.length > 0) {
+      markdown += `\n\n## Gallery\n`;
+      galleryImages.forEach((image, index) => {
+        markdown += `![Gallery Image ${index + 1}](${image.url})`;
+        if (image.caption) {
+          markdown += ` - ${image.caption}`;
+        }
+        markdown += `\n`;
+      });
+    }
+    
     const formData = new FormData();
     formData.append('content', message);
     formData.append('file', new Blob([markdown], { type: 'text/markdown' }), `${slug}.md`);
@@ -90,9 +109,16 @@ export async function POST(request) {
       galleryImages: galleryImages || []
     };
 
-    await db.createWikiSubmission(null, slug, title, content, user.id);
+    await db.createWikiSubmission(null, slug, title, content, user.id, featuredImageUrl || null, galleryImages || []);
 
-    await notifyDiscord({ title, slug, author: user.username, content });
+    await notifyDiscord({ 
+      title, 
+      slug, 
+      author: user.username, 
+      content,
+      featuredImageUrl: featuredImageUrl || null,
+      galleryImages: galleryImages || []
+    });
 
     return NextResponse.json({ message: 'Submission sent for review' }, { status: 201 });
   } catch (error) {
