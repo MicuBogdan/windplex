@@ -7,6 +7,7 @@ import Link from 'next/link';
 export default function WikiEdit({ params }) {
   const router = useRouter();
   const [page, setPage] = useState(null);
+  const [gallery, setGallery] = useState([]);
   const [formData, setFormData] = useState({ title: '', content: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,6 +27,17 @@ export default function WikiEdit({ params }) {
         }
         setPage(data.page);
         setFormData({ title: data.page.title, content: data.page.content });
+        
+        // Fetch gallery images
+        try {
+          const galleryRes = await fetch(`/api/wiki/pages/${slug}/gallery`);
+          const galleryData = await galleryRes.json();
+          if (galleryRes.ok && galleryData.images) {
+            setGallery(galleryData.images);
+          }
+        } catch (err) {
+          console.error('Failed to load gallery:', err);
+        }
       } catch (err) {
         setError('Failed to load page');
       } finally {
@@ -119,6 +131,7 @@ export default function WikiEdit({ params }) {
                 required
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="content">Content</label>
               <textarea
@@ -130,6 +143,36 @@ export default function WikiEdit({ params }) {
               ></textarea>
               <small>Use plain text. We auto-format paragraphs.</small>
             </div>
+
+            {page?.featured_image_url && (
+              <div className="form-section">
+                <h3>Featured Image</h3>
+                <div style={{ maxWidth: '300px', margin: '1rem 0' }}>
+                  <img src={page.featured_image_url} alt="Featured" style={{ width: '100%', border: '2px solid #3d2817' }} />
+                  <p style={{ marginTop: '0.5rem', color: '#6b4423', fontSize: '0.9rem' }}>
+                    {page.featured_image_url}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {gallery.length > 0 && (
+              <div className="form-section">
+                <h3>Gallery Images</h3>
+                <div className="gallery-preview">
+                  {gallery.map((image) => (
+                    <div key={image.id} className="gallery-preview-item">
+                      <img src={image.image_url} alt={image.caption || 'Gallery'} />
+                      <div className="gallery-info">
+                        {image.caption && <p>{image.caption}</p>}
+                        <p style={{ fontSize: '0.75rem', color: '#9b8b7e' }}>{image.image_url}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="form-actions">
               <Link href={`/wiki/${page.slug}`} className="btn btn-secondary">Cancel</Link>
               <button className="btn btn-primary" type="submit" disabled={saving}>

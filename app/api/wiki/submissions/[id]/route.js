@@ -8,13 +8,11 @@ async function notifyDiscord({ title, slug, submission }) {
   if (!webhookUrl) return;
 
   try {
-    const message = `📚 New World Archives page: **${title}**\nRead: https://windplex.vercel.app/wiki/${slug}`;
-    
-    let markdown = `# ${title}\n\nView: https://windplex.vercel.app/wiki/${slug}\n\n---\n\n`;
+    let message = `📚 New World Archives page: **${title}**\nRead: https://windplex.vercel.app/wiki/${slug}`;
     
     // Add featured image if present
     if (submission.featured_image_url) {
-      markdown += `## Featured Image\n![Featured Image](${submission.featured_image_url})\n\n`;
+      message += `\nFeatured: ${submission.featured_image_url}`;
     }
     
     // Add gallery images if present
@@ -28,23 +26,17 @@ async function notifyDiscord({ title, slug, submission }) {
     }
     
     if (galleryImages.length > 0) {
-      markdown += `## Gallery\n`;
-      galleryImages.forEach((image, index) => {
-        markdown += `![Gallery Image ${index + 1}](${image.url})`;
-        if (image.caption) {
-          markdown += ` - ${image.caption}`;
-        }
-        markdown += `\n`;
-      });
+      message += `\nGallery: ${galleryImages.map(img => img.url).join(' | ')}`;
     }
-    
-    const formData = new FormData();
-    formData.append('content', message);
-    formData.append('file', new Blob([markdown], { type: 'text/markdown' }), `${slug}-approved.md`);
+
+    const payload = {
+      content: message
+    };
 
     await fetch(webhookUrl, {
       method: 'POST',
-      body: formData
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
   } catch (error) {
     console.error('Discord wiki webhook failed:', error);
