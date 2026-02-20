@@ -97,12 +97,6 @@ export default async function WikiPage({ params }) {
             </div>
           </div>
 
-          {page.featured_image_url && (
-            <div className="post-featured-image">
-              <img src={page.featured_image_url} alt={page.title} />
-            </div>
-          )}
-
           <div className="post-body">
             <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
           </div>
