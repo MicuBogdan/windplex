@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { db } from '@/lib/database';
 import { getWikiSessionUser } from '@/lib/wikiAuth';
 import { notFound } from 'next/navigation';
+import WikiGallerySection from '@/app/components/WikiGallerySection';
 
 export const dynamic = 'force-dynamic';
 
@@ -106,19 +107,11 @@ export default async function WikiPage({ params }) {
             <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
           </div>
 
-          {gallery.length > 0 && (
-            <section className="wiki-gallery-section">
-              <h2>📷 Gallery</h2>
-              <div className="wiki-gallery-grid">
-                {gallery.map((image) => (
-                  <figure key={image.id} className="gallery-item">
-                    <img src={image.image_url} alt={image.caption || 'Gallery image'} />
-                    {image.caption && <figcaption>{image.caption}</figcaption>}
-                  </figure>
-                ))}
-              </div>
-            </section>
-          )}
+          <WikiGallerySection
+            gallery={gallery}
+            featuredImage={page.featured_image_url}
+            title={page.title}
+          />
 
           <div className="post-actions">
             <Link href="/wiki" className="btn btn-secondary">← Back to Wiki</Link>

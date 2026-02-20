@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ImageModal from '@/app/components/ImageModal';
 
 export default function WikiSubmit() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function WikiSubmit() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -143,7 +145,12 @@ export default function WikiSubmit() {
               />
               <small>Featured image appears in embeds and at the top of the page. Use Imgur or direct image URLs only.</small>
               {formData.featuredImageUrl && (
-                <img src={formData.featuredImageUrl} alt="Featured" style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '1rem' }} />
+                <img
+                  src={formData.featuredImageUrl}
+                  alt="Featured"
+                  style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '1rem', cursor: 'pointer' }}
+                  onClick={() => setFullscreenImage(formData.featuredImageUrl)}
+                />
               )}
             </div>
 
@@ -179,7 +186,11 @@ export default function WikiSubmit() {
                 <div className="gallery-preview">
                   {galleryImages.map((img, idx) => (
                     <div key={idx} className="gallery-preview-item">
-                      <img src={img.url} alt={`Gallery ${idx}`} />
+                      <img
+                        src={img.url}
+                        alt={`Gallery ${idx}`}
+                        onClick={() => setFullscreenImage(img.url)}
+                      />
                       <div className="gallery-info">
                         {img.caption && <p>{img.caption}</p>}
                         <button
@@ -209,6 +220,10 @@ export default function WikiSubmit() {
       <footer className="footer">
         <p>📚 World Archives</p>
       </footer>
+
+      {fullscreenImage && (
+        <ImageModal imageUrl={fullscreenImage} onClose={() => setFullscreenImage(null)} />
+      )}
     </>
   );
 }

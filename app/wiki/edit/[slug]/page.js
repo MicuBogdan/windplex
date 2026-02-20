@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ImageModal from '@/app/components/ImageModal';
 
 export default function WikiEdit({ params }) {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function WikiEdit({ params }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -179,7 +181,12 @@ export default function WikiEdit({ params }) {
               />
               <small>Featured image appears in embeds and at the top of the page. Use Imgur or direct image URLs only.</small>
               {formData.featuredImageUrl && (
-                <img src={formData.featuredImageUrl} alt="Featured" style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '1rem' }} />
+                <img
+                  src={formData.featuredImageUrl}
+                  alt="Featured"
+                  style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '1rem', cursor: 'pointer' }}
+                  onClick={() => setFullscreenImage(formData.featuredImageUrl)}
+                />
               )}
             </div>
 
@@ -215,7 +222,11 @@ export default function WikiEdit({ params }) {
                 <div className="gallery-preview">
                   {galleryImages.map((img, idx) => (
                     <div key={idx} className="gallery-preview-item">
-                      <img src={img.url} alt={`Gallery ${idx}`} />
+                      <img
+                        src={img.url}
+                        alt={`Gallery ${idx}`}
+                        onClick={() => setFullscreenImage(img.url)}
+                      />
                       <div className="gallery-info">
                         {img.caption && <p>{img.caption}</p>}
                         <button
@@ -274,6 +285,10 @@ export default function WikiEdit({ params }) {
       <footer className="footer">
         <p>📚 World Archives</p>
       </footer>
+
+      {fullscreenImage && (
+        <ImageModal imageUrl={fullscreenImage} onClose={() => setFullscreenImage(null)} />
+      )}
     </>
   );
 }
