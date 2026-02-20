@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { db } from '@/lib/database';
 import { getWikiSessionUser } from '@/lib/wikiAuth';
 import { notFound } from 'next/navigation';
+import WikiFeaturedImage from '@/app/components/WikiFeaturedImage';
 import WikiGallerySection from '@/app/components/WikiGallerySection';
 
 export const dynamic = 'force-dynamic';
@@ -97,15 +98,16 @@ export default async function WikiPage({ params }) {
             </div>
           </div>
 
+          <WikiFeaturedImage
+            imageUrl={page.featured_image_url}
+            title={page.title}
+          />
+
           <div className="post-body">
             <div dangerouslySetInnerHTML={{ __html: formattedContent }} />
           </div>
 
-          <WikiGallerySection
-            gallery={gallery}
-            featuredImage={page.featured_image_url}
-            title={page.title}
-          />
+          <WikiGallerySection gallery={gallery} />
 
           <div className="post-actions">
             <Link href="/wiki" className="btn btn-secondary">← Back to Wiki</Link>
